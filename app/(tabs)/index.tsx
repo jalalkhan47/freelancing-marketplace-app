@@ -1,98 +1,156 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import CategoryChip from '../../components/CategoryChip';
+import FreelancerCard from '../../components/FreelancerCard';
+import { Colors, FontSizes, Radius, Spacing } from '../../constants/AppTheme';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const CATEGORIES = ['All', 'Design', 'Development', 'Writing', 'Marketing', 'Video'];
 
-export default function HomeScreen() {
+const FREELANCERS = [
+  {
+    id: '1',
+    name: 'Sarah Khan',
+    role: 'UI/UX Designer',
+    rating: 4.9,
+    price: '$25/hr',
+    avatarUri: 'https://i.pravatar.cc/150?img=47',
+  },
+  {
+    id: '2',
+    name: 'Ahmed Raza',
+    role: 'Full Stack Developer',
+    rating: 4.8,
+    price: '$30/hr',
+    avatarUri: 'https://i.pravatar.cc/150?img=12',
+  },
+  {
+    id: '3',
+    name: 'Emily Chen',
+    role: 'Content Writer',
+    rating: 4.7,
+    price: '$18/hr',
+    avatarUri: 'https://i.pravatar.cc/150?img=32',
+  },
+  {
+    id: '4',
+    name: 'Bilal Ahmed',
+    role: 'Digital Marketer',
+    rating: 4.6,
+    price: '$20/hr',
+    avatarUri: 'https://i.pravatar.cc/150?img=15',
+  },
+  {
+    id: '5',
+    name: 'Sophia Lee',
+    role: 'Video Editor',
+    rating: 5.0,
+    price: '$28/hr',
+    avatarUri: 'https://i.pravatar.cc/150?img=48',
+  },
+];
+
+export default function MarketplaceScreen() {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [search, setSearch] = useState('');
+
+  const filtered = FREELANCERS.filter((f) =>
+    f.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <Text style={styles.greeting}>Hi Jalal 👋</Text>
+        <Text style={styles.headline}>Find the perfect freelancer</Text>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <TextInput
+          style={styles.search}
+          placeholder="Search by name..."
+          placeholderTextColor={Colors.textLight}
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+
+      <View style={styles.categoriesWrap}>
+        <FlatList
+          data={CATEGORIES}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
+          renderItem={({ item }) => (
+            <CategoryChip
+              label={item}
+              selected={selectedCategory === item}
+              onPress={() => setSelectedCategory(item)}
+            />
+          )}
+        />
+      </View>
+
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={<Text style={styles.sectionTitle}>Top Freelancers</Text>}
+        renderItem={({ item }) => (
+          <FreelancerCard
+            name={item.name}
+            role={item.role}
+            rating={item.rating}
+            price={item.price}
+            avatarUri={item.avatarUri}
+            onPress={() => {}}
+          />
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.md,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  greeting: {
+    fontSize: FontSizes.body,
+    color: Colors.textLight,
+  },
+  headline: {
+    fontSize: FontSizes.title,
+    fontWeight: '800',
+    color: Colors.text,
+    marginTop: 2,
+    marginBottom: Spacing.md,
+  },
+  search: {
+    height: 48,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    fontSize: FontSizes.body,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  categoriesWrap: {
+    marginBottom: Spacing.md,
+  },
+  listContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.xl,
+  },
+  sectionTitle: {
+    fontSize: FontSizes.title,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: Spacing.md,
   },
 });
