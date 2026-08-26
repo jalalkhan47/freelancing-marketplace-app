@@ -1,62 +1,24 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CategoryChip from '../../components/CategoryChip';
-import FreelancerCard from '../../components/FreelancerCard';
 import { Colors, FontSizes, Radius, Spacing } from '../../constants/AppTheme';
-
-const CATEGORIES = ['All', 'Design', 'Development', 'Writing', 'Marketing', 'Video'];
-
-const FREELANCERS = [
-  {
-    id: '1',
-    name: 'Sarah Khan',
-    role: 'UI/UX Designer',
-    rating: 4.9,
-    price: '$25/hr',
-    avatarUri: 'https://i.pravatar.cc/150?img=47',
-  },
-  {
-    id: '2',
-    name: 'Ahmed Raza',
-    role: 'Full Stack Developer',
-    rating: 4.8,
-    price: '$30/hr',
-    avatarUri: 'https://i.pravatar.cc/150?img=12',
-  },
-  {
-    id: '3',
-    name: 'Emily Chen',
-    role: 'Content Writer',
-    rating: 4.7,
-    price: '$18/hr',
-    avatarUri: 'https://i.pravatar.cc/150?img=32',
-  },
-  {
-    id: '4',
-    name: 'Bilal Ahmed',
-    role: 'Digital Marketer',
-    rating: 4.6,
-    price: '$20/hr',
-    avatarUri: 'https://i.pravatar.cc/150?img=15',
-  },
-  {
-    id: '5',
-    name: 'Sophia Lee',
-    role: 'Video Editor',
-    rating: 5.0,
-    price: '$28/hr',
-    avatarUri: 'https://i.pravatar.cc/150?img=48',
-  },
-];
+import { useFavorites } from '../../context/FavoritesContext';
+import { CATEGORIES, FREELANCERS } from '../../data/marketplace';
 
 export default function MarketplaceScreen() {
+  const router = useRouter();
+  const { isFreelancerFavorite, toggleFavoriteFreelancer } = useFavorites();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [search, setSearch] = useState('');
 
-  const filtered = FREELANCERS.filter((f) =>
-    f.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = FREELANCERS.filter((f) => {
+    const matchesCategory = selectedCategory === 'All' || f.category === selectedCategory;
+    const matchesSearch = f.name.toLowerCase().includes(search.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -95,16 +57,36 @@ export default function MarketplaceScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={<Text style={styles.sectionTitle}>Top Freelancers</Text>}
-        renderItem={({ item }) => (
-          <FreelancerCard
-            name={item.name}
-            role={item.role}
-            rating={item.rating}
-            price={item.price}
-            avatarUri={item.avatarUri}
-            onPress={() => {}}
-          />
-        )}
+        renderItem={({ item }) => {
+          const favorited = isFreelancerFavorite(item.id);
+          return (
+            <Pressable
+              style={styles.card}
+                 onPress={() => router.push({ pathname: '/freelancer/[id]', params: { id: item.id } } as any)}
+            >
+              <Image source={{ uri: item.avatarUri }} style={styles.avatar} />
+              <View style={styles.info}>
+                <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+                <Text style={styles.role} numberOfLines={1}>{item.role}</Text>
+                <View style={styles.row}>
+                  <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
+                  <Text style={styles.price}>{item.price}</Text>
+                </View>
+              </View>
+              <Pressable
+                onPress={() => toggleFavoriteFreelancer(item.id)}
+                hitSlop={10}
+                style={styles.favBtn}
+              >
+                <Ionicons
+                  name={favorited ? 'heart' : 'heart-outline'}
+                  size={22}
+                  color={favorited ? Colors.secondary : Colors.textLight}
+                />
+              </Pressable>
+            </Pressable>
+          );
+        }}
       />
     </SafeAreaView>
   );
@@ -152,5 +134,53 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
     marginBottom: Spacing.md,
+  },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: Radius.md,
+    marginRight: Spacing.md,
+    backgroundColor: Colors.surface,
+  },
+  info: {
+    flex: 1,
+  },
+  name: {
+    fontSize: FontSizes.subtitle,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  role: {
+    fontSize: FontSizes.body,
+    color: Colors.textLight,
+    marginTop: 2,
+  },
+  row: {
+    flexDirection: 'row',
+    marginTop: Spacing.sm,
+  },
+  rating: {
+    fontSize: FontSizes.body,
+    color: Colors.text,
+    fontWeight: '600',
+    marginRight: Spacing.md,
+  },
+  price: {
+    fontSize: FontSizes.body,
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  favBtn: {
+    padding: Spacing.xs,
   },
 });
