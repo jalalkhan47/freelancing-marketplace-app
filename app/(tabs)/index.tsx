@@ -33,6 +33,14 @@ export default function MarketplaceScreen() {
           value={search}
           onChangeText={setSearch}
         />
+
+        <Pressable
+          style={styles.browseServicesLink}
+          onPress={() => router.push('/services' as any)}
+        >
+          <Text style={styles.browseServicesText}>Browse All Services</Text>
+          <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+        </Pressable>
       </View>
 
       <View style={styles.categoriesWrap}>
@@ -62,7 +70,7 @@ export default function MarketplaceScreen() {
           return (
             <Pressable
               style={styles.card}
-                 onPress={() => router.push({ pathname: '/freelancer/[id]', params: { id: item.id } } as any)}
+              onPress={() => router.push({ pathname: '/freelancer/[id]', params: { id: item.id } } as any)}
             >
               <Image source={{ uri: item.avatarUri }} style={styles.avatar} />
               <View style={styles.info}>
@@ -121,6 +129,19 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.body,
     borderWidth: 1,
     borderColor: Colors.border,
+  },
+  browseServicesLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  browseServicesText: {
+    fontSize: FontSizes.body,
+    color: Colors.primary,
+    fontWeight: '600',
+    marginRight: Spacing.xs,
   },
   categoriesWrap: {
     marginBottom: Spacing.md,

@@ -1,0 +1,292 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import CategoryChip from '../../components/CategoryChip';
+import { Colors, FontSizes, Radius, Spacing } from '../../constants/AppTheme';
+import { useFavorites } from '../../context/FavoritesContext';
+import { CATEGORIES, FREELANCERS, SERVICES } from '../../data/marketplace';
+
+const RATING_OPTIONS = [0, 4, 4.5, 4.8];
+
+export default function ServicesScreen() {
+  const router = useRouter();
+  const { isServiceFavorite, toggleFavoriteService } = useFavorites();
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [search, setSearch] = useState('');
+  const [filterVisible, setFilterVisible] = useState(false);
+
+  const [maxPrice, setMaxPrice] = useState('');
+  const [minRating, setMinRating] = useState(0);
+
+  const [appliedMaxPrice, setAppliedMaxPrice] = useState<number | null>(null);
+  const [appliedMinRating, setAppliedMinRating] = useState(0);
+
+  const getPriceNumber = (price: string) => parseInt(price.replace(/[^0-9]/g, ''), 10);
+
+  const filtered = SERVICES.filter((s) => {
+    const matchesCategory = selectedCategory === 'All' || s.category === selectedCategory;
+    const matchesSearch = s.title.toLowerCase().includes(search.toLowerCase());
+    const matchesPrice = appliedMaxPrice === null || getPriceNumber(s.price) <= appliedMaxPrice;
+    const matchesRating = s.rating >= appliedMinRating;
+    return matchesCategory && matchesSearch && matchesPrice && matchesRating;
+  });
+
+  const getFreelancerName = (freelancerId: string) => {
+    const f = FREELANCERS.find((fr) => fr.id === freelancerId);
+    return f ? f.name : '';
+  };
+
+  const applyFilters = () => {
+    setAppliedMaxPrice(maxPrice ? parseInt(maxPrice, 10) : null);
+    setAppliedMinRating(minRating);
+    setFilterVisible(false);
+  };
+
+  const clearFilters = () => {
+    setMaxPrice('');
+    setMinRating(0);
+    setAppliedMaxPrice(null);
+    setAppliedMinRating(0);
+    setFilterVisible(false);
+  };
+
+  const activeFilterCount = (appliedMaxPrice !== null ? 1 : 0) + (appliedMinRating > 0 ? 1 : 0);
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <Text style={styles.headline}>Browse Services</Text>
+
+        <View style={styles.searchRow}>
+          <TextInput
+            style={styles.search}
+            placeholder="Search services..."
+            placeholderTextColor={Colors.textLight}
+            value={search}
+            onChangeText={setSearch}
+          />
+          <Pressable style={styles.filterBtn} onPress={() => setFilterVisible(true)}>
+            <Ionicons name="options-outline" size={22} color={Colors.primary} />
+            {activeFilterCount > 0 && (
+              <View style={styles.filterBadge}>
+                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.categoriesWrap}>
+        <FlatList
+          data={CATEGORIES}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
+          renderItem={({ item }) => (
+            <CategoryChip
+              label={item}
+              selected={selectedCategory === item}
+              onPress={() => setSelectedCategory(item)}
+            />
+          )}
+        />
+      </View>
+
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={<Text style={styles.emptyText}>No services match your filters.</Text>}
+        renderItem={({ item }) => {
+          const favorited = isServiceFavorite(item.id);
+          return (
+            <Pressable
+              style={styles.card}
+              onPress={() => router.push({ pathname: '/service/[id]', params: { id: item.id } } as any)}
+            >
+              <Image source={{ uri: item.imageUri }} style={styles.image} />
+              <View style={styles.info}>
+                <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+                <Text style={styles.freelancerName}>{getFreelancerName(item.freelancerId)}</Text>
+                <View style={styles.row}>
+                  <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
+                  <Text style={styles.price}>{item.price}</Text>
+                </View>
+              </View>
+              <Pressable
+                onPress={() => toggleFavoriteService(item.id)}
+                hitSlop={10}
+                style={styles.favBtn}
+              >
+                <Ionicons
+                  name={favorited ? 'heart' : 'heart-outline'}
+                  size={22}
+                  color={favorited ? Colors.secondary : Colors.textLight}
+                />
+              </Pressable>
+            </Pressable>
+          );
+        }}
+      />
+
+      <Modal visible={filterVisible} animationType="slide" transparent onRequestClose={() => setFilterVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.modalTitle}>Filter Services</Text>
+
+            <Text style={styles.modalLabel}>Max Price ($)</Text>
+            <TextInput
+              style={styles.priceInput}
+              placeholder="e.g. 200"
+              placeholderTextColor={Colors.textLight}
+              keyboardType="numeric"
+              value={maxPrice}
+              onChangeText={setMaxPrice}
+            />
+
+            <Text style={styles.modalLabel}>Minimum Rating</Text>
+            <View style={styles.ratingRow}>
+              {RATING_OPTIONS.map((r) => (
+                <Pressable
+                  key={r}
+                  style={[styles.ratingChip, minRating === r && styles.ratingChipActive]}
+                  onPress={() => setMinRating(r)}
+                >
+                  <Text style={[styles.ratingChipText, minRating === r && styles.ratingChipTextActive]}>
+                    {r === 0 ? 'Any' : `${r}+`}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <View style={styles.modalActions}>
+              <Pressable style={styles.clearBtn} onPress={clearFilters}>
+                <Text style={styles.clearBtnText}>Clear</Text>
+              </Pressable>
+              <Pressable style={styles.applyBtn} onPress={applyFilters}>
+                <Text style={styles.applyBtnText}>Apply</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: Colors.background },
+  header: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, paddingBottom: Spacing.md },
+  headline: { fontSize: FontSizes.title, fontWeight: '800', color: Colors.text, marginBottom: Spacing.md },
+  searchRow: { flexDirection: 'row', alignItems: 'center' },
+  search: {
+    flex: 1,
+    height: 48,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    fontSize: FontSizes.body,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  filterBtn: {
+    width: 48,
+    height: 48,
+    marginLeft: Spacing.sm,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: Colors.secondary,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  filterBadgeText: { color: Colors.white, fontSize: 11, fontWeight: '700' },
+  categoriesWrap: { marginBottom: Spacing.md },
+  listContent: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xl },
+  emptyText: { textAlign: 'center', color: Colors.textLight, marginTop: Spacing.xl, fontSize: FontSizes.body },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+  },
+  image: { width: 64, height: 64, borderRadius: Radius.md, marginRight: Spacing.md, backgroundColor: Colors.surface },
+  info: { flex: 1 },
+  title: { fontSize: FontSizes.body, fontWeight: '700', color: Colors.text },
+  freelancerName: { fontSize: FontSizes.body, color: Colors.textLight, marginTop: 2 },
+  row: { flexDirection: 'row', marginTop: Spacing.sm },
+  rating: { fontSize: FontSizes.body, color: Colors.text, fontWeight: '600', marginRight: Spacing.md },
+  price: { fontSize: FontSizes.body, color: Colors.primary, fontWeight: '700' },
+  favBtn: { padding: Spacing.xs },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalSheet: {
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: Radius.lg,
+    borderTopRightRadius: Radius.lg,
+    padding: Spacing.lg,
+  },
+  modalTitle: { fontSize: FontSizes.title, fontWeight: '800', color: Colors.text, marginBottom: Spacing.md },
+  modalLabel: { fontSize: FontSizes.body, fontWeight: '600', color: Colors.text, marginBottom: Spacing.sm, marginTop: Spacing.md },
+  priceInput: {
+    height: 48,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    fontSize: FontSizes.body,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  ratingRow: { flexDirection: 'row', flexWrap: 'wrap' },
+  ratingChip: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginRight: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  ratingChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  ratingChipText: { color: Colors.text, fontWeight: '600' },
+  ratingChipTextActive: { color: Colors.white },
+  modalActions: { flexDirection: 'row', marginTop: Spacing.lg },
+  clearBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.sm,
+  },
+  clearBtnText: { color: Colors.text, fontWeight: '700' },
+  applyBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  applyBtnText: { color: Colors.white, fontWeight: '700' },
+});
