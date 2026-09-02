@@ -37,6 +37,11 @@ export default function ProfileScreen() {
           <Text style={styles.value}>{user.bio}</Text>
         </View>
 
+        <Pressable style={styles.freelancerBtn} onPress={() => router.push('/freelancer-profile' as any)}>
+          <Ionicons name="briefcase-outline" size={18} color={Colors.white} />
+          <Text style={styles.editBtnText}>View Freelancer Profile</Text>
+        </Pressable>
+
         <Pressable style={styles.editBtn} onPress={() => router.push('/edit-profile' as any)}>
           <Ionicons name="pencil" size={18} color={Colors.white} />
           <Text style={styles.editBtnText}>Edit Profile</Text>
@@ -71,6 +76,16 @@ const styles = StyleSheet.create({
   },
   label: { fontSize: FontSizes.body - 1, color: Colors.textLight, marginBottom: 4 },
   value: { fontSize: FontSizes.body, color: Colors.text, fontWeight: '600' },
+  freelancerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.secondary,
+    borderRadius: Radius.md,
+    height: 50,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
   editBtn: {
     flexDirection: 'row',
     alignItems: 'center',

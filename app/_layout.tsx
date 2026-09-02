@@ -18,6 +18,9 @@ export default function RootLayout() {
           <Stack.Screen name="service/[id]" />
           <Stack.Screen name="profile" />
           <Stack.Screen name="edit-profile" />
+          <Stack.Screen name="freelancer-profile" />
+          <Stack.Screen name="my-services" />
+          <Stack.Screen name="create-service" />
         </Stack>
       </FavoritesProvider>
     </UserProvider>

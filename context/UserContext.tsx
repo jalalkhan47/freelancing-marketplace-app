@@ -6,6 +6,8 @@ export type UserProfile = {
   bio: string;
   role: string;
   avatarUri: string;
+  skills: string[];
+  hourlyRate: string;
 };
 
 type UserContextType = {
@@ -19,6 +21,8 @@ const defaultUser: UserProfile = {
   bio: 'Aspiring freelancer and developer.',
   role: 'Freelancer',
   avatarUri: 'https://i.pravatar.cc/150?img=68',
+  skills: ['React Native', 'JavaScript'],
+  hourlyRate: '$15/hr',
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
