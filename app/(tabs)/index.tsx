@@ -23,8 +23,15 @@ export default function MarketplaceScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hi Jalal 👋</Text>
-        <Text style={styles.headline}>Find the perfect freelancer</Text>
+        <View style={styles.topRow}>
+          <View>
+            <Text style={styles.greeting}>Hi Jalal 👋</Text>
+            <Text style={styles.headline}>Find the perfect freelancer</Text>
+          </View>
+          <Pressable onPress={() => router.push('/profile' as any)} hitSlop={10}>
+            <Ionicons name="person-circle-outline" size={32} color={Colors.primary} />
+          </Pressable>
+        </View>
 
         <TextInput
           style={styles.search}
@@ -109,6 +116,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.md,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   greeting: {
     fontSize: FontSizes.body,
