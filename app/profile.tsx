@@ -42,6 +42,11 @@ export default function ProfileScreen() {
           <Text style={styles.editBtnText}>View Freelancer Profile</Text>
         </Pressable>
 
+        <Pressable style={styles.proposalsBtn} onPress={() => router.push('/my-proposals' as any)}>
+          <Ionicons name="document-text-outline" size={18} color={Colors.primary} />
+          <Text style={styles.proposalsBtnText}>My Proposals</Text>
+        </Pressable>
+
         <Pressable style={styles.editBtn} onPress={() => router.push('/edit-profile' as any)}>
           <Ionicons name="pencil" size={18} color={Colors.white} />
           <Text style={styles.editBtnText}>Edit Profile</Text>
@@ -86,6 +91,18 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
   },
+  proposalsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: Radius.md,
+    height: 50,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+  },
+  proposalsBtnText: { color: Colors.primary, fontWeight: '700', fontSize: FontSizes.body, marginLeft: Spacing.sm },
   editBtn: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -41,13 +41,23 @@ export default function MarketplaceScreen() {
           onChangeText={setSearch}
         />
 
-        <Pressable
-          style={styles.browseServicesLink}
-          onPress={() => router.push('/services' as any)}
-        >
-          <Text style={styles.browseServicesText}>Browse All Services</Text>
-          <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
-        </Pressable>
+        <View style={styles.linksRow}>
+          <Pressable
+            style={styles.linkBtn}
+            onPress={() => router.push('/services' as any)}
+          >
+            <Text style={styles.linkText}>Browse Services</Text>
+            <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+          </Pressable>
+
+          <Pressable
+            style={styles.linkBtn}
+            onPress={() => router.push('/find-jobs' as any)}
+          >
+            <Text style={styles.linkText}>Find Jobs</Text>
+            <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.categoriesWrap}>
@@ -142,14 +152,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  browseServicesLink: {
+  linksRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: Spacing.md,
+  },
+  linkBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: Spacing.md,
     paddingVertical: Spacing.sm,
   },
-  browseServicesText: {
+  linkText: {
     fontSize: FontSizes.body,
     color: Colors.primary,
     fontWeight: '600',
