@@ -47,6 +47,11 @@ export default function ProfileScreen() {
           <Text style={styles.proposalsBtnText}>My Proposals</Text>
         </Pressable>
 
+        <Pressable style={styles.proposalsBtn} onPress={() => router.push('/my-orders' as any)}>
+          <Ionicons name="briefcase-outline" size={18} color={Colors.primary} />
+          <Text style={styles.proposalsBtnText}>My Orders</Text>
+        </Pressable>
+
         <Pressable style={styles.editBtn} onPress={() => router.push('/edit-profile' as any)}>
           <Ionicons name="pencil" size={18} color={Colors.white} />
           <Text style={styles.editBtnText}>Edit Profile</Text>
