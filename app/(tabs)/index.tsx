@@ -6,11 +6,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CategoryChip from '../../components/CategoryChip';
 import { Colors, FontSizes, Radius, Spacing } from '../../constants/AppTheme';
 import { useFavorites } from '../../context/FavoritesContext';
+import { useNotifications } from '../../context/NotificationsContext';
 import { CATEGORIES, FREELANCERS } from '../../data/marketplace';
 
 export default function MarketplaceScreen() {
   const router = useRouter();
   const { isFreelancerFavorite, toggleFavoriteFreelancer } = useFavorites();
+  const { unreadCount } = useNotifications();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [search, setSearch] = useState('');
 
@@ -28,9 +30,22 @@ export default function MarketplaceScreen() {
             <Text style={styles.greeting}>Hi Jalal 👋</Text>
             <Text style={styles.headline}>Find the perfect freelancer</Text>
           </View>
-          <Pressable onPress={() => router.push('/profile' as any)} hitSlop={10}>
-            <Ionicons name="person-circle-outline" size={32} color={Colors.primary} />
-          </Pressable>
+          <View style={styles.headerIcons}>
+            <Pressable onPress={() => router.push('/messages' as any)} hitSlop={10} style={styles.headerIconBtn}>
+              <Ionicons name="chatbubble-ellipses-outline" size={26} color={Colors.primary} />
+            </Pressable>
+            <Pressable onPress={() => router.push('/notifications' as any)} hitSlop={10} style={styles.headerIconBtn}>
+              <Ionicons name="notifications-outline" size={26} color={Colors.primary} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount}</Text>
+                </View>
+              )}
+            </Pressable>
+            <Pressable onPress={() => router.push('/profile' as any)} hitSlop={10}>
+              <Ionicons name="person-circle-outline" size={32} color={Colors.primary} />
+            </Pressable>
+          </View>
         </View>
 
         <TextInput
@@ -142,6 +157,30 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginTop: 2,
     marginBottom: Spacing.md,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIconBtn: {
+    marginRight: Spacing.md,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: Colors.secondary,
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    color: Colors.white,
+    fontSize: 10,
+    fontWeight: '700',
   },
   search: {
     height: 48,

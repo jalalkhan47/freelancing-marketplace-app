@@ -94,6 +94,16 @@ export default function OrderDetailsScreen() {
             <Text style={styles.deliverBtnText}>Submit Delivery</Text>
           </Pressable>
         )}
+
+        {order.status === 'Completed' && (
+          <Pressable
+            style={styles.deliverBtn}
+            onPress={() => router.push({ pathname: '/review/[id]', params: { id: order.id } } as any)}
+          >
+            <Ionicons name="star-outline" size={18} color={Colors.white} />
+            <Text style={styles.deliverBtnText}>Leave a Review</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
