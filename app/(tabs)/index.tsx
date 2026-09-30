@@ -56,6 +56,14 @@ export default function MarketplaceScreen() {
           onChangeText={setSearch}
         />
 
+        <Pressable
+          style={styles.searchBar}
+          onPress={() => router.push('/search' as any)}
+        >
+          <Ionicons name="search-outline" size={18} color={Colors.textLight} />
+          <Text style={styles.searchBarText}>Search freelancers, services, jobs...</Text>
+        </Pressable>
+
         <View style={styles.linksRow}>
           <Pressable
             style={styles.linkBtn}
@@ -70,6 +78,14 @@ export default function MarketplaceScreen() {
             onPress={() => router.push('/find-jobs' as any)}
           >
             <Text style={styles.linkText}>Find Jobs</Text>
+            <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+          </Pressable>
+
+          <Pressable
+            style={styles.linkBtn}
+            onPress={() => router.push('/dashboard' as any)}
+          >
+            <Text style={styles.linkText}>Dashboard</Text>
             <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
           </Pressable>
         </View>
@@ -190,6 +206,22 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.body,
     borderWidth: 1,
     borderColor: Colors.border,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 44,
+    backgroundColor: Colors.white,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    marginTop: Spacing.sm,
+  },
+  searchBarText: {
+    color: Colors.textLight,
+    fontSize: FontSizes.body - 1,
+    marginLeft: Spacing.sm,
   },
   linksRow: {
     flexDirection: 'row',

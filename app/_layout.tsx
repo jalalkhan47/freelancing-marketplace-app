@@ -43,6 +43,8 @@ export default function RootLayout() {
                     <Stack.Screen name="chat/[id]" />
                     <Stack.Screen name="notifications" />
                     <Stack.Screen name="review/[id]" />
+                    <Stack.Screen name="search" />
+                    <Stack.Screen name="dashboard" />
                   </Stack>
                 </ReviewsProvider>
               </NotificationsProvider>
